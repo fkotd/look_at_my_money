@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:look_at_my_money/screens/expenses_screen.dart';
 import 'package:look_at_my_money/screens/sign_in_screen.dart';
 import 'package:look_at_my_money/screens/sign_up_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(LookAtMyMoneyApp());
 }
 
 class LookAtMyMoneyApp extends StatelessWidget {
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,7 +20,20 @@ class LookAtMyMoneyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: _Home(),
+      home: FutureBuilder(
+        future: _initialization,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('error'); // TODO
+          }
+
+          if (snapshot.connectionState == ConnectionState.done) {
+            return _Home();
+          }
+
+          return Text('loading'); // TODO
+        },
+      ),
     );
   }
 }
