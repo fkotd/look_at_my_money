@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:look_at_my_money/models/user.dart';
 import 'package:look_at_my_money/widgets/user_expenses_card.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ExpensesScreen extends StatefulWidget {
   // TODO: change with group name

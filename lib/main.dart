@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:look_at_my_money/screens/expenses_screen.dart';
-import 'package:look_at_my_money/screens/sign_in_screen.dart';
-import 'package:look_at_my_money/screens/sign_up_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:look_at_my_money/screens/expenses_screen.dart';
+import 'package:look_at_my_money/screens/group_screen.dart';
+import 'package:look_at_my_money/screens/sign_in_screen.dart';
+import 'package:look_at_my_money/screens/sign_up_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,7 +63,7 @@ class _HomeState extends State<_Home> {
 
           if (snapshot.data != null) {
             print(snapshot.data.uid);
-            return ExpensesScreen();
+            return GroupScreen();
           } else if (_showSignIn) {
             return SignInScreen(
               switchToSignUp: _toggleShowSignIn,
