@@ -3,6 +3,7 @@ import 'package:look_at_my_money/screens/expenses_screen.dart';
 import 'package:look_at_my_money/screens/sign_in_screen.dart';
 import 'package:look_at_my_money/screens/sign_up_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +45,6 @@ class _Home extends StatefulWidget {
 }
 
 class _HomeState extends State<_Home> {
-  bool _isAuthenticated = false;
   bool _showSignIn = true;
 
   void _toggleShowSignIn() {
@@ -53,21 +53,25 @@ class _HomeState extends State<_Home> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isAuthenticated) {
-      return ExpensesScreen();
-    }
+    return StreamBuilder<User>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
+          if (snapshot.hasError) {
+            return Text('error'); // TODO
+          }
 
-    if (_showSignIn) {
-      return SignInScreen(
-        switchToSignUp: _toggleShowSignIn,
-        onSignIn: () {
-          setState(() => _isAuthenticated = true);
-        },
-      );
-    } else {
-      return SignUpScreen(
-        switchToSignIn: _toggleShowSignIn,
-      );
-    }
+          if (snapshot.data != null) {
+            print(snapshot.data.uid);
+            return ExpensesScreen();
+          } else if (_showSignIn) {
+            return SignInScreen(
+              switchToSignUp: _toggleShowSignIn,
+            );
+          } else {
+            return SignUpScreen(
+              switchToSignIn: _toggleShowSignIn,
+            );
+          }
+        });
   }
 }

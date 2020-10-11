@@ -55,6 +55,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   }
 
   Future<void> _createExpenses() async {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
     return showDialog<void>(
         context: context,
         barrierDismissible: true,
