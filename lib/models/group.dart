@@ -1,19 +1,20 @@
 import 'package:look_at_my_money/models/expenses.dart';
 
 class Group {
-  String _name;
-  List<String> _userIds = [];
+  final String id;
+  final String name;
+  final List<String> usersId;
 
-  Group(this._name);
+  Group(this.id, this.name, this.usersId);
 
   void addUserId(String userId) {
-    this._userIds.add(userId);
+    this.usersId.add(userId);
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'name': _name,
-      'userIds': _userIds,
+      'name': name,
+      'usersId': usersId,
     };
   }
 }

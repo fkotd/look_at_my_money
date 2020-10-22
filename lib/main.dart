@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:look_at_my_money/screens/expenses_screen.dart';
-import 'package:look_at_my_money/screens/group_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:look_at_my_money/screens/groups_screen.dart';
 import 'package:look_at_my_money/screens/sign_in_screen.dart';
 import 'package:look_at_my_money/screens/sign_up_screen.dart';
+import 'package:look_at_my_money/providers/auth_providers.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(LookAtMyMoneyApp());
+  runApp(ProviderScope(child: LookAtMyMoneyApp()));
 }
 
 class LookAtMyMoneyApp extends StatelessWidget {
@@ -54,16 +55,15 @@ class _HomeState extends State<_Home> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
-          if (snapshot.hasError) {
-            return Text('error'); // TODO
-          }
-
-          if (snapshot.data != null) {
-            print(snapshot.data.uid);
-            return GroupScreen();
+    return Consumer(builder: (context, watch, child) {
+      AsyncValue<String> currentUser = watch(AuthProviders.currentUserProvider);
+      return currentUser.when(
+        loading: () => const CircularProgressIndicator(),
+        error: (error, stack) => const Text('Ono owo'),
+        data: (currentUser) {
+          // TODO: is this really currentUser, not currentUser.data ?
+          if (currentUser != null) {
+            return GroupsScreen();
           } else if (_showSignIn) {
             return SignInScreen(
               switchToSignUp: _toggleShowSignIn,
@@ -73,6 +73,8 @@ class _HomeState extends State<_Home> {
               switchToSignIn: _toggleShowSignIn,
             );
           }
-        });
+        },
+      );
+    });
   }
 }

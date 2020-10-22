@@ -3,6 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  Stream<String> get currentUserStream {
+    return _auth.authStateChanges().map((user) => user?.uid);
+  }
+
   void signUp(String email, String password) async {
     try {
       UserCredential userCredential = await _auth

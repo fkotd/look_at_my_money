@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:look_at_my_money/models/user.dart';
 
-class UserExpensesCard extends StatefulWidget {
+class ExpensesCard extends StatefulWidget {
   User user;
 
-  UserExpensesCard(this.user);
+  ExpensesCard(this.user);
 
   @override
-  _UserExpensesCardState createState() => _UserExpensesCardState();
+  _ExpensesCardState createState() => _ExpensesCardState();
 }
 
-class _UserExpensesCardState extends State<UserExpensesCard> {
+class _ExpensesCardState extends State<ExpensesCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
