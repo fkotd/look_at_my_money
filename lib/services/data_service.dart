@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:look_at_my_money/models/group.dart';
 import 'package:look_at_my_money/models/user.dart';
+import 'package:look_at_my_money/models/expense.dart';
 
 class DataService {
   static FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -12,29 +13,69 @@ class DataService {
   DataService(this._currentUser);
 
   void createGroup(Group group) async {
-    await _groups.add(group.toMap());
+    try {
+      await _groups.add(group.toMap());
+    } catch (err) {
+      // TODO: handle error
+    }
   }
 
-  Stream<List<Group>> getGroupsOfCurrentUser() {
+  void createExpenses(Expense expense) async {
+    try {
+      await _users
+          .doc(this._currentUser)
+          .collection('expenses')
+          .add(expense.toMap());
+    } catch (err) {
+      // TODO: handle error
+    }
+  }
+
+  Stream<List<Group>> getCurrentUserGroups() {
     return _groups
         .where('usersId', arrayContains: this._currentUser)
         .snapshots()
         .map((QuerySnapshot querySnapshot) {
       return querySnapshot.docs
-          .map(
-            (doc) => Group(doc.id, doc['name'], doc['usersId'].cast<String>()),
-          )
+          .map((doc) => Group(
+                id: doc.id,
+                name: doc['name'],
+                usersId: doc['usersId'].cast<String>(),
+              ))
           .toList();
     });
   }
 
-  Stream<List<User>> getUsersOfGroup(Group group) {
+  Stream<List<User>> getGroupUsers(Group group) {
     return _users
         .where(FieldPath.documentId, whereIn: group.usersId)
         .snapshots()
         .map((QuerySnapshot querySnapshot) {
       return querySnapshot.docs
-          .map((doc) => User(doc.id, doc['name']))
+          .map((doc) => User(
+                id: doc.id,
+                name: doc['name'],
+              ))
+          .toList();
+    });
+  }
+
+  Stream<List<Expense>> getGroupExpenses(Group group) {
+    print('hey');
+    print(group.id);
+    return _firestore
+        .collectionGroup('expenses')
+        .where('groupId', isEqualTo: group.id)
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => Expense(
+                id: doc.id,
+                groupId: doc['groupId'],
+                value: doc['value'],
+                hint: doc['hint'],
+                date: doc['date'].toDate(),
+              ))
           .toList();
     });
   }

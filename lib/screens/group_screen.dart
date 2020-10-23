@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:look_at_my_money/models/user.dart';
 import 'package:look_at_my_money/models/group.dart';
+import 'package:look_at_my_money/models/expense.dart';
 import 'package:look_at_my_money/providers/data_providers.dart';
-import 'package:look_at_my_money/widgets/expenses_card.dart';
+import 'package:look_at_my_money/widgets/sum_list.dart';
+import 'package:look_at_my_money/widgets/expense_list.dart';
 
 class GroupScreen extends StatefulWidget {
   final Group group;
@@ -16,90 +17,84 @@ class GroupScreen extends StatefulWidget {
 }
 
 class _GroupScreenState extends State<GroupScreen> {
+  final valueController = TextEditingController();
+  final hintController = TextEditingController();
+
+  void _createExpenses(BuildContext context) {
+    final dataService = context.read(DataProviders.dataServiceProvider);
+
+    Expense expense = Expense(
+      groupId: widget.group.id,
+      value: double.parse(valueController.text),
+      hint: hintController.text,
+      date: new DateTime.now(),
+    );
+
+    dataService.createExpenses(expense);
+  }
+
+  Future<void> _showForm() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Show your money doggy'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextField(
+                  controller: valueController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Expenses',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: hintController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'For what ?',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Throw'),
+              onPressed: () {
+                _createExpenses(context);
+                valueController.text = '';
+                hintController.text = '';
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.group.name),
       ),
-      body: Container(
-        child: Consumer(
-          builder: (context, watch, child) {
-            final users =
-                watch(DataProviders.usersOfGroupProvider(widget.group));
-            return users.when(
-                loading: () => const CircularProgressIndicator(),
-                error: (error, stack) => Center(child: Text('ono')),
-                data: (users) {
-                  return GridView.count(
-                    primary: false,
-                    padding: const EdgeInsets.all(20),
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 2,
-                    children: <Widget>[
-                      for (var user in users) ExpensesCard(user),
-                    ],
-                  );
-                });
-          },
-        ),
+      body: Column(
+        children: <Widget>[
+          SumList(group: widget.group),
+          ExpenseList(group: widget.group),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _createExpenses();
+          _showForm();
         },
         child: Icon(Icons.attach_money),
       ),
     );
-  }
-
-  Future<void> _createExpenses() async {
-    return showDialog<void>(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Add expenses'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  Text('Pay your declarement doggy [̲̅\$̲̅(̲̅ ✧≖ ͜ʖ≖)̲̅\$̲̅]'),
-                  TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Expenses',
-                    ),
-                  ),
-                  TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'For what ?',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Throw'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-          actions:
-          <Widget>[
-            TextButton(
-              child: Text('Drop that'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ];
-        });
   }
 }

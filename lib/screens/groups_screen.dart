@@ -24,36 +24,36 @@ class _GroupsScreenState extends State<GroupsScreen> {
     final currentUser = context.read(AuthProviders.currentUserProvider);
     final dataService = context.read(DataProviders.dataServiceProvider);
 
-    Group group = Group(null, groupNameController.text, []);
-    group.addUserId(currentUser.data.value);
+    Group group = Group(name: groupNameController.text, usersId: []);
     dataService.createGroup(group);
   }
 
   Future<void> _showForm(BuildContext context) async {
     return showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Create a new group'),
-            content: TextField(
-              decoration: InputDecoration(
-                labelText: 'Enter the name of the group',
-              ),
-              controller: groupNameController,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Create a new group'),
+          content: TextField(
+            decoration: InputDecoration(
+              labelText: 'Enter the name of the group',
             ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Submit'),
-                onPressed: () {
-                  _createGroup(context);
-                  groupNameController.text = '';
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-            elevation: 24.0,
-          );
-        });
+            controller: groupNameController,
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Submit'),
+              onPressed: () {
+                _createGroup(context);
+                groupNameController.text = '';
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+          elevation: 24.0,
+        );
+      },
+    );
   }
 
   Widget build(BuildContext context) {
@@ -63,38 +63,37 @@ class _GroupsScreenState extends State<GroupsScreen> {
       ),
       body: Consumer(
         builder: (context, watch, child) {
-          final groupsOfUsers =
-              watch(DataProviders.groupsOfCurrentUserProvider);
+          final groupsOfUsers = watch(DataProviders.currentUserGroupsProvider);
 
           return groupsOfUsers.when(
-              loading: () => const CircularProgressIndicator(),
-              error: (error, stack) {
-                print('here');
-                print(error.toString());
-                return const Text('ono'); // TODO
-              },
-              data: (groupsOfUsers) {
-                return ListView(
-                  children: [
-                    for (var group in groupsOfUsers)
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    GroupScreen(group: group)),
-                          );
-                        },
-                        child: Card(
-                          child: ListTile(
-                            title: Text(group.name),
-                          ),
+            loading: () => const CircularProgressIndicator(),
+            error: (error, stack) {
+              print('here');
+              print(error.toString());
+              return const Text('ono'); // TODO
+            },
+            data: (groupsOfUsers) {
+              return ListView(
+                children: [
+                  for (var group in groupsOfUsers)
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => GroupScreen(group: group)),
+                        );
+                      },
+                      child: Card(
+                        child: ListTile(
+                          title: Text(group.name),
                         ),
                       ),
-                  ],
-                );
-              });
+                    ),
+                ],
+              );
+            },
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
