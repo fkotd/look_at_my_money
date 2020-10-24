@@ -12,6 +12,11 @@ class DataProviders {
     return DataService(currentUser.data?.value);
   });
 
+  static final currentUserInfosProvider = StreamProvider.autoDispose((ref) {
+    final dataService = ref.watch(dataServiceProvider);
+    return dataService.getCurrentUserInfos();
+  });
+
   static final currentUserGroupsProvider = StreamProvider.autoDispose((ref) {
     final dataService = ref.watch(dataServiceProvider);
     return dataService.getCurrentUserGroups();

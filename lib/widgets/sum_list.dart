@@ -18,7 +18,9 @@ class SumList extends StatelessWidget {
         return users.when(
           loading: () => const CircularProgressIndicator(),
           // TODO: handle error with something else ?
-          error: (error, stack) => Center(child: Text('Ono !')),
+          error: (error, stack) => Center(
+            child: Text(error.toString()),
+          ),
           data: (users) {
             return GridView.count(
               primary: false,

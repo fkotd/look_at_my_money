@@ -1,11 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:look_at_my_money/models/group.dart';
 import 'package:look_at_my_money/models/expense.dart';
+import 'package:look_at_my_money/models/group.dart';
 import 'package:look_at_my_money/providers/data_providers.dart';
 import 'package:look_at_my_money/widgets/sum_list.dart';
 import 'package:look_at_my_money/widgets/expense_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GroupScreen extends StatefulWidget {
   final Group group;
@@ -77,8 +78,15 @@ class _GroupScreenState extends State<GroupScreen> {
     );
   }
 
+  void _updateLastVisitedGroup() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lastVisitedString', group.id);
+  }
+
   @override
   Widget build(BuildContext context) {
+    _updateLastVisitedGroup();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.group.name),
