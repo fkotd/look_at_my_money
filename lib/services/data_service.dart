@@ -61,11 +61,46 @@ class DataService {
   }
 
   Stream<List<Expense>> getGroupExpenses(Group group) {
-    print('hey');
-    print(group.id);
     return _firestore
         .collectionGroup('expenses')
         .where('groupId', isEqualTo: group.id)
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => Expense(
+                id: doc.id,
+                groupId: doc['groupId'],
+                value: doc['value'],
+                hint: doc['hint'],
+                date: doc['date'].toDate(),
+              ))
+          .toList();
+    });
+  }
+
+  Stream<List<Expense>> getUserExpenses(Group group, User user) {
+    return _users
+        .doc(user.id)
+        .collection('expenses')
+        .where('groupId', isEqualTo: group.id)
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => Expense(
+                id: doc.id,
+                groupId: doc['groupId'],
+                value: doc['value'],
+                hint: doc['hint'],
+                date: doc['date'].toDate(),
+              ))
+          .toList();
+    });
+  }
+
+  Stream<List<Expense>> getUserAllExpenses(User user) {
+    return _users
+        .doc(user.id)
+        .collection('expenses')
         .snapshots()
         .map((QuerySnapshot querySnapshot) {
       return querySnapshot.docs

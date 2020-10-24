@@ -4,6 +4,7 @@ import 'package:look_at_my_money/services/data_service.dart';
 import 'package:look_at_my_money/models/group.dart';
 import 'package:look_at_my_money/models/user.dart';
 import 'package:look_at_my_money/models/expense.dart';
+import 'package:look_at_my_money/models/user_group_param.dart';
 
 class DataProviders {
   static final dataServiceProvider = Provider((ref) {
@@ -26,5 +27,17 @@ class DataProviders {
       StreamProvider.autoDispose.family<List<Expense>, Group>((ref, group) {
     final dataService = ref.watch(dataServiceProvider);
     return dataService.getGroupExpenses(group);
+  });
+
+  static final userExpensesProvider = StreamProvider.autoDispose
+      .family<List<Expense>, UserGroupParam>((ref, params) {
+    final dataService = ref.watch(dataServiceProvider);
+    return dataService.getUserExpenses(params.group, params.user);
+  });
+
+  static final userAllExpensesProvider =
+      StreamProvider.autoDispose.family<List<Expense>, User>((ref, user) {
+    final dataService = ref.watch(dataServiceProvider);
+    return dataService.getUserAllExpenses(user);
   });
 }

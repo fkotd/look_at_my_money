@@ -27,7 +27,7 @@ class SumList extends StatelessWidget {
               mainAxisSpacing: 10,
               crossAxisCount: 2,
               children: <Widget>[
-                for (var user in users) SumCard(user: user),
+                for (var user in users) SumCard(user: user, group: group),
               ],
               shrinkWrap: true,
             );
