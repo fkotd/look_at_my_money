@@ -31,17 +31,28 @@ class DataService {
     }
   }
 
+  Stream<User> getCurrentUserInfos() {
+    return _users.doc(this._currentUser).snapshots().map(
+          (doc) => User(
+            id: doc.id,
+            name: doc['name'],
+          ),
+        );
+  }
+
   Stream<List<Group>> getCurrentUserGroups() {
     return _groups
         .where('usersId', arrayContains: this._currentUser)
         .snapshots()
         .map((QuerySnapshot querySnapshot) {
       return querySnapshot.docs
-          .map((doc) => Group(
-                id: doc.id,
-                name: doc['name'],
-                usersId: doc['usersId'].cast<String>(),
-              ))
+          .map(
+            (doc) => Group(
+              id: doc.id,
+              name: doc['name'],
+              usersId: doc['usersId'].cast<String>(),
+            ),
+          )
           .toList();
     });
   }
@@ -113,5 +124,13 @@ class DataService {
               ))
           .toList();
     });
+  }
+
+  void updateLastVisitingGroup(Group group) async {
+    try {
+      await _users.doc(_currentUser).update({'lastVisitedGroup': group.id});
+    } catch (err) {
+      // TODO: handle error
+    }
   }
 }

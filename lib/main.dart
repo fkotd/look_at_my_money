@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:look_at_my_money/app_theme.dart';
 import 'package:look_at_my_money/screens/groups_screen.dart';
 import 'package:look_at_my_money/screens/sign_in_screen.dart';
 import 'package:look_at_my_money/screens/sign_up_screen.dart';
 import 'package:look_at_my_money/providers/auth_providers.dart';
+import 'package:look_at_my_money/providers/data_providers.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,10 +21,7 @@ class LookAtMyMoneyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Look At My Money',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      theme: AppTheme.themeData,
       home: FutureBuilder(
         future: _initialization,
         builder: (context, snapshot) {
@@ -56,10 +55,11 @@ class _HomeState extends State<_Home> {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, watch, child) {
-      AsyncValue<String> currentUser = watch(AuthProviders.currentUserProvider);
+      final currentUser = watch(AuthProviders.currentUserProvider);
+
       return currentUser.when(
         loading: () => const CircularProgressIndicator(),
-        error: (error, stack) => const Text('Ono owo'),
+        error: (error, stack) => const Text('Ono'),
         data: (currentUser) {
           // TODO: is this really currentUser, not currentUser.data ?
           if (currentUser != null) {
