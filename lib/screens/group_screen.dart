@@ -81,6 +81,7 @@ class _GroupScreenState extends State<GroupScreen> {
   void _updateLastVisitedGroup() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('lastVisitedString', widget.group.id);
+    // await prefs.setString('lastVisitedString', group.id);
   }
 
   @override
