@@ -14,21 +14,24 @@ class ExpenseList extends StatelessWidget {
     return Consumer(
       builder: (context, watch, child) {
         final expenses = watch(DataProviders.groupExpensesProvider(group));
+        final groupUsers = watch(DataProviders.groupUsersProvider(group));
 
-        return expenses.when(
-          loading: () => const CircularProgressIndicator(),
-          // TODO: handle error with something else ?
-          error: (error, stack) => Center(child: Text(error.toString())),
-          data: (expenses) {
-            print(expenses);
-            return ListView(
-              children: <Widget>[
-                for (var expense in expenses) ExpenseCard(expense: expense),
-              ],
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-            );
-          },
+        if (expenses.data == null || groupUsers.data == null) {
+          return const SliverToBoxAdapter(
+            child: const CircularProgressIndicator(),
+          );
+        }
+        return SliverList(
+          delegate: SliverChildListDelegate(
+            <Widget>[
+              for (var expense in expenses.data.value)
+                ExpenseCard(
+                  expense: expense,
+                  user: groupUsers.data.value
+                      .firstWhere((user) => user.id == expense.userId),
+                ),
+            ],
+          ),
         );
       },
     );

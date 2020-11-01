@@ -40,6 +40,16 @@ class DataService {
         );
   }
 
+  Stream<Group> getGroupById(String groupId) {
+    return _groups.doc(groupId).snapshots().map(
+          (doc) => Group(
+            id: doc.id,
+            name: doc['name'],
+            usersId: doc['usersId'].cast<String>(),
+          ),
+        );
+  }
+
   Stream<List<Group>> getCurrentUserGroups() {
     return _groups
         .where('usersId', arrayContains: this._currentUser)
@@ -81,6 +91,7 @@ class DataService {
           .map((doc) => Expense(
                 id: doc.id,
                 groupId: doc['groupId'],
+                userId: doc.reference.parent.parent.id,
                 value: doc['value'],
                 hint: doc['hint'],
                 date: doc['date'].toDate(),
@@ -108,6 +119,8 @@ class DataService {
     });
   }
 
+  // FIXME: don’t pass the user because only the current user can see all its expneses
+  // TODO: move this function above with other user concerned functions
   Stream<List<Expense>> getUserAllExpenses(User user) {
     return _users
         .doc(user.id)
@@ -124,13 +137,5 @@ class DataService {
               ))
           .toList();
     });
-  }
-
-  void updateLastVisitingGroup(Group group) async {
-    try {
-      await _users.doc(_currentUser).update({'lastVisitedGroup': group.id});
-    } catch (err) {
-      // TODO: handle error
-    }
   }
 }

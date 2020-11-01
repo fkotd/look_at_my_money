@@ -5,6 +5,7 @@ import 'package:look_at_my_money/models/group.dart';
 import 'package:look_at_my_money/models/user.dart';
 import 'package:look_at_my_money/models/expense.dart';
 import 'package:look_at_my_money/models/user_group_param.dart';
+import 'package:look_at_my_money/providers/group_state_notifier.dart';
 
 class DataProviders {
   static final dataServiceProvider = Provider((ref) {
@@ -44,5 +45,25 @@ class DataProviders {
       StreamProvider.autoDispose.family<List<Expense>, User>((ref, user) {
     final dataService = ref.watch(dataServiceProvider);
     return dataService.getUserAllExpenses(user);
+  });
+
+  static final groupIdProvider =
+      StateNotifierProvider<GroupStateNotifier>((ref) {
+    return GroupStateNotifier();
+  });
+
+  static final groupProvider = StreamProvider((ref) async* {
+    final dataService = ref.watch(dataServiceProvider);
+    final groupId = ref.watch(groupIdProvider.state);
+
+    if (groupId.data != null) {
+      print('hello');
+      print(groupId.data.value);
+      if (groupId.data.value == null) {
+        yield null;
+      } else {
+        yield* dataService.getGroupById(groupId.data.value);
+      }
+    }
   });
 }

@@ -16,22 +16,19 @@ class SumList extends StatelessWidget {
         final users = watch(DataProviders.groupUsersProvider(group));
 
         return users.when(
-          loading: () => const CircularProgressIndicator(),
+          loading: () => const SliverToBoxAdapter(
+            child: const CircularProgressIndicator(),
+          ),
           // TODO: handle error with something else ?
-          error: (error, stack) => Center(
-            child: Text(error.toString()),
+          error: (error, stack) => const SliverToBoxAdapter(
+            child: const Text('Ono'),
           ),
           data: (users) {
-            return GridView.count(
-              primary: false,
-              padding: const EdgeInsets.all(20),
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
+            return SliverGrid.count(
               crossAxisCount: 2,
               children: <Widget>[
                 for (var user in users) SumCard(user: user, group: group),
               ],
-              shrinkWrap: true,
             );
           },
         );

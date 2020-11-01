@@ -7,7 +7,6 @@ class Group {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'name': name,
       'usersId': usersId,
     };

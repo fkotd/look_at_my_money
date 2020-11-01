@@ -4,15 +4,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:look_at_my_money/app_theme.dart';
 import 'package:look_at_my_money/screens/drawer_screen.dart';
-import 'package:look_at_my_money/screens/groups_screen.dart';
-import 'package:look_at_my_money/screens/no_group_screen.dart';
+import 'package:look_at_my_money/screens/group_screen.dart';
 import 'package:look_at_my_money/screens/sign_in_screen.dart';
 import 'package:look_at_my_money/screens/sign_up_screen.dart';
 import 'package:look_at_my_money/providers/auth_providers.dart';
 import 'package:look_at_my_money/providers/data_providers.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 
 void main() {
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.blueGrey[900],
+  ));
   WidgetsFlutterBinding.ensureInitialized();
   runApp(ProviderScope(child: LookAtMyMoneyApp()));
 }
@@ -55,12 +57,6 @@ class _HomeState extends State<_Home> {
     setState(() => _showSignIn = !_showSignIn);
   }
 
-  Future<String> _getLastVisitedGroup() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('lastVisitedGroup');
-    // TODO: check that the group exists
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -72,26 +68,12 @@ class _HomeState extends State<_Home> {
           error: (error, stack) => const Text('Ono'),
           data: (currentUser) {
             if (currentUser != null) {
-              return FutureBuilder(
-                  future: _getLastVisitedGroup(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      if (snapshot.hasError) {
-                        return Text('Ono!');
-                      }
-                      if (snapshot.data != null) {
-                        return GroupsScreen();
-                      }
-                      return Stack(
-                        children: <Widget>[
-                          DrawerScreen(),
-                          NoGroupScreen(),
-                        ],
-                      );
-                    } else {
-                      return CircularProgressIndicator();
-                    }
-                  });
+              return Stack(
+                children: <Widget>[
+                  DrawerScreen(),
+                  GroupScreen(),
+                ],
+              );
             } else if (_showSignIn) {
               return SignInScreen(
                 switchToSignUp: _toggleShowSignIn,
